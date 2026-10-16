@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control MPP 32 Bluetooth</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- HEADER / BARRA SUPERIOR -->
+    <header class="w-full bg-slate-800/80 backdrop-blur-md border-b border-slate-700/60 sticky top-0 z-50 px-4 py-3 flex items-center justify-between shadow-lg">
+        <!-- Botón de Conexión Bluetooth -->
+        <button id="btnConnect" onclick="toggleBluetooth()" class="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 shadow-md bg-rose-600 hover:bg-rose-500 text-white border border-rose-500/50">
+            <span id="btStatusDot" class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
+            <span id="btText">BT: Desconectado</span>
+        </button>
+
+        <!-- Título Central -->
+        <h1 class="text-base font-semibold tracking-wide text-slate-200 hidden sm:block">Control MPP 32</h1>
+
+        <!-- Botón de Consola -->
+        <button onclick="openConsole()" class="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 shadow-md bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500/50">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            Consola
+        </button>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL: TECLADO MATRICIAL -->
+    <main class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold tracking-tight text-white mb-1">Panel de Control</h2>
+            </div>
+
+            <!-- Grilla 3x3 de Botones -->
+            <div class="grid grid-cols-3 gap-3.5">
+                <button onclick="sendCommand('m1')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">Obra</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m1)</span>
+                </button>
+                <button onclick="sendCommand('m2')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">Nombre Etapa</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m2)</span>
+                </button>
+                <button onclick="sendCommand('m3')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">Cod. Modelo</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m3)</span>
+                </button>
+                <button onclick="sendCommand('m4')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">Apr. Replant.</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m4)</span>
+                </button>
+                <button onclick="sendCommand('m5')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">Fecha Ap</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m5)</span>
+                </button>
+                <button onclick="sendCommand('m6')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">RTE</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m6)</span>
+                </button>
+                <button onclick="sendCommand('m7')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">Apr RTE</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m7)</span>
+                </button>
+                <button onclick="sendCommand('m8')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">Nom. Acta</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m8)</span>
+                </button>
+                <button onclick="sendCommand('m9')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">SAP</span>
+                    <span class="text-[10px] text-slate-500 mt-1 font-mono">(m9)</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- VENTANA MODAL DE CONSOLA -->
+    <div id="consoleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl shadow-2xl flex flex-col h-[80vh] overflow-hidden">
+            <div class="px-4 py-3 bg-slate-900/80 border-b border-slate-700 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                    <h3 class="font-semibold text-sm text-white">Consola Bluetooth UART</h3>
+                </div>
+                <button onclick="closeConsole()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-700/50 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="consoleLog" class="flex-1 p-4 overflow-y-auto space-y-3 font-mono text-xs bg-slate-950/50">
+                <div class="text-slate-500 text-center italic">-- Historial de comunicación iniciado --</div>
+            </div>
+            <div class="p-3 bg-slate-900 border-t border-slate-700 flex gap-2">
+                <input type="text" id="consoleInput" placeholder="Escribe un comando libre..." onkeydown="handleKey(event)" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono">
+                <button onclick="sendConsoleMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2 rounded-xl text-xs transition-colors shadow-md">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full text-center py-3 text-[11px] text-slate-500 border-t border-slate-800">
+        Web Bluetooth API &bull; Control MPP 32
+    </footer>
+
+    <script>
+        const BLE_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+        const BLE_RX_CHAR_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+        const BLE_TX_CHAR_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+
+        let bluetoothDevice = null;
+        let rxCharacteristic = null;
+        let txCharacteristic = null;
+
+        async function toggleBluetooth() {
+            if (!bluetoothDevice || !bluetoothDevice.gatt.connected) {
+                try {
+                    appendConsole("Buscando dispositivos Bluetooth...", "system");
+                    
+                    // Buscamos dispositivos que expongan nuestro servicio UART (así filtramos ruido y vemos nombres)
+                    bluetoothDevice = await navigator.bluetooth.requestDevice({
+                        filters: [{ services: [BLE_SERVICE_UUID] }],
+                        optionalServices: [BLE_SERVICE_UUID]
+                    });
+
+                    bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
+
+                    appendConsole("Conectando al servidor GATT...", "system");
+                    const server = await bluetoothDevice.gatt.connect();
+
+                    appendConsole("Obteniendo servicio BLE...", "system");
+                    const service = await server.getPrimaryService(BLE_SERVICE_UUID);
+
+                    appendConsole("Configurando canales de comunicación...", "system");
+                    rxCharacteristic = await service.getCharacteristic(BLE_RX_CHAR_UUID);
+                    txCharacteristic = await service.getCharacteristic(BLE_TX_CHAR_UUID);
+
+                    await txCharacteristic.startNotifications();
+                    txCharacteristic.addEventListener('characteristicvaluechanged', handleIncomingData);
+
+                    updateConnectionUI(true);
+                    appendConsole("¡Conectado exitosamente con la ESP32!", "success");
+
+                } catch (error) {
+                    console.error("Error de conexión:", error);
+                    appendConsole("Error de conexión: " + error.message, "error");
+                    updateConnectionUI(false);
+                }
+            } else {
+                if (bluetoothDevice.gatt.connected) {
+                    bluetoothDevice.gatt.disconnect();
+                }
+                updateConnectionUI(false);
+                appendConsole("Desconectado manualmente.", "system");
+            }
+        }
+
+        function onDisconnected() {
+            updateConnectionUI(false);
+            appendConsole("Se perdió la conexión con la ESP32.", "error");
+        }
+
+        function updateConnectionUI(isConnected) {
+            const btn = document.getElementById('btnConnect');
+            const dot = document.getElementById('btStatusDot');
+            const text = document.getElementById('btText');
+
+            if (isConnected) {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 shadow-md bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500/50";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-white animate-ping";
+                text.textContent = "BT: Conectado";
+            } else {
+                btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 shadow-md bg-rose-600 hover:bg-rose-500 text-white border border-rose-500/50";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-white";
+                text.textContent = "BT: Desconectado";
+            }
+        }
+
+        async function sendCommand(cmd) {
+            if (!rxCharacteristic) {
+                alert("¡Primero debes conectarte a la ESP32 presionando el botón 'BT'!");
+                appendConsole("Intento de envío fallido: No hay conexión BLE.", "error");
+                return;
+            }
+            try {
+                const encoder = new TextEncoder();
+                await rxCharacteristic.writeValue(encoder.encode(cmd));
+                appendConsole("Enviado -> " + cmd, "sent");
+            } catch (error) {
+                console.error("Error al enviar comando:", error);
+                appendConsole("Error al enviar " + cmd + ": " + error.message, "error");
+            }
+        }
+
+        function handleIncomingData(event) {
+            const value = event.target.value;
+            const decoder = new TextDecoder('utf-8');
+            const stringValue = decoder.decode(value);
+            appendConsole("Recibido <- " + stringValue.trim(), "received");
+        }
+
+        function openConsole() {
+            document.getElementById('consoleModal').classList.remove('hidden');
+            const log = document.getElementById('consoleLog');
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function closeConsole() {
+            document.getElementById('consoleModal').classList.add('hidden');
+        }
+
+        function handleKey(event) {
+            if (event.key === 'Enter') {
+                sendConsoleMessage();
+            }
+        }
+
+        async function sendConsoleMessage() {
+            const input = document.getElementById('consoleInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (!rxCharacteristic) {
+                alert("¡Primero conéctate por Bluetooth!");
+                return;
+            }
+
+            try {
+                const encoder = new TextEncoder();
+                await rxCharacteristic.writeValue(encoder.encode(text));
+                appendConsole("Consola Enviado -> " + text, "sent");
+                input.value = '';
+            } catch (error) {
+                appendConsole("Error consola: " + error.message, "error");
+            }
+        }
+
+        function appendConsole(message, type = 'system') {
+            const log = document.getElementById('consoleLog');
+            const div = document.createElement('div');
+            
+            if (type === 'sent') {
+                div.className = "text-indigo-400 font-semibold";
+            } else if (type === 'received') {
+                div.className = "text-emerald-400 font-semibold";
+            } else if (type === 'error') {
+                div.className = "text-rose-400 font-semibold";
+            } else {
+                div.className = "text-slate-400";
+            }
+
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+    </script>
+</body>
+</html>
