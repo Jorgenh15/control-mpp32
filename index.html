@@ -36,12 +36,23 @@
     <!-- CONTENIDO PRINCIPAL: TECLADO MATRICIAL -->
     <main class="flex-1 flex items-center justify-center p-4">
         <div class="w-full max-w-md">
-            <div class="text-center mb-6">
+            <div class="text-center mb-4">
                 <h2 class="text-xl font-bold tracking-tight text-white mb-1">Panel de Control</h2>
             </div>
 
+            <!-- DISPLAY EN VIVO (PERFIL) -->
+            <div class="mb-5 bg-slate-950/80 border border-slate-700/80 rounded-2xl p-3 shadow-inner flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping" id="liveIndicator"></span>
+                    <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Perfil:</span>
+                </div>
+                <div id="liveDisplay" class="font-mono text-xs text-emerald-400 font-semibold truncate max-w-[220px]">
+                    Esperando datos...
+                </div>
+            </div>
+
             <!-- Grilla 3x3 de Botones -->
-            <div class="grid grid-cols-3 gap-3.5">
+            <div class="grid grid-cols-3 gap-3.5 mb-3.5">
                 <button onclick="sendCommand('m1')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
                     <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">Obra</span>
                     <span class="text-[10px] text-slate-500 mt-1 font-mono">(m1)</span>
@@ -77,6 +88,27 @@
                 <button onclick="sendCommand('m9')" class="group relative flex flex-col items-center justify-center p-4 bg-slate-800/90 hover:bg-indigo-600/20 border border-slate-700/80 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
                     <span class="text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">SAP</span>
                     <span class="text-[10px] text-slate-500 mt-1 font-mono">(m9)</span>
+                </button>
+            </div>
+
+            <!-- 3 BOTONES ADICIONALES SIN ASIGNAR -->
+            <div class="grid grid-cols-3 gap-3.5 mb-3.5">
+                <button onclick="sendCommand('extra1')" class="group relative flex flex-col items-center justify-center p-3 bg-slate-800/50 hover:bg-indigo-600/20 border border-slate-700/60 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-400 group-hover:text-indigo-400 transition-colors">Libre 1</span>
+                </button>
+                <button onclick="sendCommand('extra2')" class="group relative flex flex-col items-center justify-center p-3 bg-slate-800/50 hover:bg-indigo-600/20 border border-slate-700/60 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-400 group-hover:text-indigo-400 transition-colors">Libre 2</span>
+                </button>
+                <button onclick="sendCommand('extra3')" class="group relative flex flex-col items-center justify-center p-3 bg-slate-800/50 hover:bg-indigo-600/20 border border-slate-700/60 hover:border-indigo-500 rounded-2xl shadow-md transition-all duration-200 active:scale-95 text-center">
+                    <span class="text-xs font-semibold text-slate-400 group-hover:text-indigo-400 transition-colors">Libre 3</span>
+                </button>
+            </div>
+
+            <!-- BOTÓN SIGUIENTE (CENTRAL) -->
+            <div class="flex justify-center">
+                <button onclick="sendCommand('next')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 border border-indigo-500/50 rounded-2xl shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 text-white font-medium text-sm">
+                    <span>Siguiente</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                 </button>
             </div>
         </div>
@@ -122,7 +154,6 @@
                 try {
                     appendConsole("Buscando dispositivos Bluetooth...", "system");
                     
-                    // Buscamos dispositivos que expongan nuestro servicio UART (así filtramos ruido y vemos nombres)
                     bluetoothDevice = await navigator.bluetooth.requestDevice({
                         filters: [{ services: [BLE_SERVICE_UUID] }],
                         optionalServices: [BLE_SERVICE_UUID]
@@ -144,7 +175,10 @@
                     txCharacteristic.addEventListener('characteristicvaluechanged', handleIncomingData);
 
                     updateConnectionUI(true);
-                    appendConsole("¡Conectado exitosamente con la ESP32!", "success");
+                    
+                    // Mostramos el nombre real del dispositivo conectado
+                    const deviceName = bluetoothDevice.name || "Dispositivo BLE";
+                    appendConsole(`¡Conectado exitosamente con "${deviceName}"!`, "success");
 
                 } catch (error) {
                     console.error("Error de conexión:", error);
@@ -163,6 +197,7 @@
         function onDisconnected() {
             updateConnectionUI(false);
             appendConsole("Se perdió la conexión con la ESP32.", "error");
+            document.getElementById('liveDisplay').textContent = "Desconectado";
         }
 
         function updateConnectionUI(isConnected) {
@@ -178,6 +213,7 @@
                 btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 shadow-md bg-rose-600 hover:bg-rose-500 text-white border border-rose-500/50";
                 dot.className = "w-2.5 h-2.5 rounded-full bg-white";
                 text.textContent = "BT: Desconectado";
+                document.getElementById('liveDisplay').textContent = "Esperando datos...";
             }
         }
 
@@ -200,8 +236,13 @@
         function handleIncomingData(event) {
             const value = event.target.value;
             const decoder = new TextDecoder('utf-8');
-            const stringValue = decoder.decode(value);
-            appendConsole("Recibido <- " + stringValue.trim(), "received");
+            const stringValue = decoder.decode(value).trim();
+            
+            appendConsole("Recibido <- " + stringValue, "received");
+
+            // ACTUALIZA EL DISPLAY DE PERFIL
+            const liveDisplay = document.getElementById('liveDisplay');
+            liveDisplay.textContent = stringValue;
         }
 
         function openConsole() {
